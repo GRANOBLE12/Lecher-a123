@@ -41,35 +41,53 @@ class ItemController extends Controller
      * Almacenar un nuevo ítem en Firebase.
      */
     public function store(Request $request)
-    {
-        // Validación inicial
-        $validated = $request->validate([
-            'id_vaca' => 'required|string|max:50',
-            'raza' => 'required|string|max:100',
-            'fecha_nacimiento' => 'required|date',
-            'peso' => 'required|numeric|min:0',
-            'estado' => 'required|string|in:Activa,Inactiva,Vendida,Enferma',
-            'id_madre' => 'nullable|string',
-            'observaciones' => 'nullable|string|max:500'
-        ]);
+{
+    // Reglas base de validación
+    $rules = [
+        'id_vaca' => 'required|string|max:50',
+        'raza' => 'required|string|max:100',
+        'fecha_nacimiento' => 'required|date',
+        'peso' => 'required|numeric|min:0',
+        'estado' => 'required|string|in:Activa,Inactiva,Vendida,Enferma',
+        'id_madre' => 'nullable|string',
+        'observaciones' => 'nullable|string|max:500',
+    ];
 
-        // Verificar si el id_vaca ya existe
-        $items = $this->database->getReference('items')->getValue() ?? [];
-
-        foreach ($items as $existingItem) {
-            if (isset($existingItem['id_vaca']) && $existingItem['id_vaca'] === $validated['id_vaca']) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['id_vaca' => 'El ID de vaca ya está registrado']);
-            }
-        }
-
-        // Si no existe, crear el nuevo registro
-        $this->database->getReference('items')->push($validated);
-
-        return redirect()->route('items.index')
-            ->with('success', 'Registro de vaca creado correctamente.');
+    // Agregar reglas condicionales
+    if ($request->estado === 'Enferma') {
+        $rules['enfermedad'] = 'nullable|string|max:500';
+        $rules['sintomas'] = 'required|string|max:500';
     }
+
+    // Validación
+    $validated = $request->validate($rules);
+
+    // Preparar datos para Firebase
+    $data = $request->all();
+
+    // Solo mantener enfermedad y síntomas si el estado es Enferma
+    if ($request->estado !== 'Enferma') {
+        unset($data['enfermedad']);
+        unset($data['sintomas']);
+    }
+
+    // Verificar si el id_vaca ya existe
+    $items = $this->database->getReference('items')->getValue() ?? [];
+
+    foreach ($items as $existingItem) {
+        if (isset($existingItem['id_vaca']) && $existingItem['id_vaca'] === $validated['id_vaca']) {
+            return back()
+                ->withInput()
+                ->withErrors(['id_vaca' => 'El ID de vaca ya está registrado']);
+        }
+    }
+
+    // Crear nuevo registro
+    $this->database->getReference('items')->push($data);
+
+    return redirect()->route('items.index')
+        ->with('success', 'Registro de vaca creado correctamente.');
+}
 
     /**
      * Mostrar un ítem específico.
@@ -105,35 +123,53 @@ class ItemController extends Controller
      * Actualizar un ítem en Firebase.
      */
     public function update(Request $request, $id)
-    {
-        // Validación inicial
-        $validated = $request->validate([
-            'id_vaca' => 'required|string|max:50',
-            'raza' => 'required|string|max:100',
-            'fecha_nacimiento' => 'required|date',
-            'peso' => 'required|numeric|min:0',
-            'estado' => 'required|string|in:Activa,Inactiva,Vendida,Enferma',
-            'id_madre' => 'nullable|string',
-            'observaciones' => 'nullable|string|max:500'
-        ]);
+{
+    // Reglas base de validación
+    $rules = [
+        'id_vaca' => 'required|string|max:50',
+        'raza' => 'required|string|max:100',
+        'fecha_nacimiento' => 'required|date',
+        'peso' => 'required|numeric|min:0',
+        'estado' => 'required|string|in:Activa,Inactiva,Vendida,Enferma',
+        'id_madre' => 'nullable|string',
+        'observaciones' => 'nullable|string|max:500',
+    ];
 
-        // Verificar si el id_vaca ya existe en otros registros
-        $items = $this->database->getReference('items')->getValue() ?? [];
-
-        foreach ($items as $itemId => $existingItem) {
-            if ($itemId !== $id && isset($existingItem['id_vaca']) && $existingItem['id_vaca'] === $validated['id_vaca']) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['id_vaca' => 'El ID de vaca ya está registrado en otro animal']);
-            }
-        }
-
-        // Si no hay duplicados, actualizar
-        $this->database->getReference('items/' . $id)->update($validated);
-
-        return redirect()->route('items.index')
-            ->with('success', 'Registro de vaca actualizado correctamente.');
+    // Agregar reglas condicionales
+    if ($request->estado === 'Enferma') {
+        $rules['enfermedad'] = 'nullable|string|max:500';
+        $rules['sintomas'] = 'required|string|max:500';
     }
+
+    // Validación
+    $validated = $request->validate($rules);
+
+    // Preparar datos para Firebase
+    $data = $request->all();
+
+    // Solo mantener enfermedad y síntomas si el estado es Enferma
+    if ($request->estado !== 'Enferma') {
+        $data['enfermedad'] = null;
+        $data['sintomas'] = null;
+    }
+
+    // Verificar si el id_vaca ya existe en otros registros
+    $items = $this->database->getReference('items')->getValue() ?? [];
+
+    foreach ($items as $itemId => $existingItem) {
+        if ($itemId !== $id && isset($existingItem['id_vaca']) && $existingItem['id_vaca'] === $validated['id_vaca']) {
+            return back()
+                ->withInput()
+                ->withErrors(['id_vaca' => 'El ID de vaca ya está registrado en otro animal']);
+        }
+    }
+
+    // Actualizar registro
+    $this->database->getReference('items/' . $id)->update($data);
+
+    return redirect()->route('items.index')
+        ->with('success', 'Registro de vaca actualizado correctamente.');
+}
 
     /**
      * Eliminar un ítem de Firebase.
@@ -145,8 +181,34 @@ class ItemController extends Controller
 
         return redirect()->route('items.index')->with('success', 'Ítem eliminado correctamente.');
     }
-    public function buscar()
+    // Método para mostrar formulario de búsqueda
+public function buscar()
 {
-    return view('items.buscar'); // Muestra el formulario de búsqueda
+    return view('items.search');
 }
+
+// Método para procesar búsqueda
+public function search(Request $request)
+{
+    $idVaca = $request->input('id_vaca');
+    $items = $this->database->getReference('items')->getValue() ?? [];
+    
+    foreach ($items as $id => $item) {
+        if (isset($item['id_vaca']) && $item['id_vaca'] == $idVaca) {
+            return view('items.search', [
+                'item' => $item,
+                'id' => $id,
+                'searchPerformed' => true,
+                'notFound' => false
+            ]);
+        }
+    }
+    
+    return view('items.search', [
+        'searchPerformed' => true,
+        'notFound' => true,
+        'id_vaca' => $idVaca
+    ]);
+}
+
 }
