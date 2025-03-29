@@ -11,3 +11,8 @@ Route::post('/items/buscar', [ItemController::class, 'search'])->name('items.sea
 
 // El resource debe ir después de las rutas personalizadas
 Route::resource('items', ItemController::class)->except(['buscar']);
+
+Route::get('/produccion', [ItemController::class, 'produccionForm'])->name('produccion.form');
+Route::post('/produccion/buscar', [ItemController::class, 'searchForProduction'])->name('produccion.buscar');
+Route::post('/produccion/{id}/agregar', [ItemController::class, 'addProduction'])->name('produccion.agregar');
+Route::get('/produccion/{id}/historial', [ItemController::class, 'verProduccion'])->name('produccion.historial');

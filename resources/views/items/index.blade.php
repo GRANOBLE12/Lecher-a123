@@ -9,6 +9,9 @@
         <a href="{{ route('items.buscar') }}" class="btn btn-warning me-2">
             <i class="fas fa-search"></i> Buscar Vaca
         </a>
+        <a href="{{ route('produccion.form') }}" class="btn btn-info me-2">
+            <i class="fas fa-weight"></i> Producción Leche
+        </a>
         <a href="{{ route('items.create') }}" class="btn btn-success">
             <i class="fas fa-plus"></i> Nuevo Registro
         </a>

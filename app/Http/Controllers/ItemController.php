@@ -51,6 +51,7 @@ class ItemController extends Controller
         'estado' => 'required|string|in:Activa,Inactiva,Vendida,Enferma',
         'id_madre' => 'nullable|string',
         'observaciones' => 'nullable|string|max:500',
+        
     ];
 
     // Agregar reglas condicionales
@@ -208,6 +209,84 @@ public function search(Request $request)
         'searchPerformed' => true,
         'notFound' => true,
         'id_vaca' => $idVaca
+    ]);
+}
+// Método para mostrar formulario de producción
+public function produccionForm()
+{
+    return view('items.produccion');
+}
+
+// Método para buscar vaca y mostrar formulario de producción
+public function searchForProduction(Request $request)
+{
+    $idVaca = $request->input('id_vaca');
+    $items = $this->database->getReference('items')->getValue() ?? [];
+    
+    foreach ($items as $id => $item) {
+        if (isset($item['id_vaca']) && $item['id_vaca'] == $idVaca) {
+            return view('items.produccion', [
+                'vaca' => $item,
+                'vacaId' => $id,
+                'found' => true
+            ]);
+        }
+    }
+    
+    return view('items.produccion')->with('error', 'Vaca no encontrada');
+}
+
+// Método para registrar producción
+public function addProduction(Request $request, $id)
+{
+    $validated = $request->validate([
+        'fecha' => 'required|date',
+        'turno' => 'required|in:Mañana,Tarde',
+        'litros' => 'required|numeric|min:0',
+        'calidad' => 'nullable|string|max:100'
+    ]);
+
+    // Obtener referencia a la vaca
+    $vacaRef = $this->database->getReference("items/$id");
+    
+    // Obtener producción existente o crear array vacío
+    $produccion = $vacaRef->getChild('produccion')->getValue() ?? [];
+    
+    // Agregar nuevo registro
+    $produccion[] = [
+        'fecha' => $validated['fecha'],
+        'turno' => $validated['turno'],
+        'litros' => $validated['litros'],
+        'calidad' => $validated['calidad'] ?? null
+    ];
+    
+    // Actualizar en Firebase
+    $vacaRef->update(['produccion' => $produccion]);
+
+    return redirect()->route('produccion.form')
+        ->with('success', 'Producción registrada exitosamente');
+}
+
+// Método para ver historial de producción
+public function verProduccion($id)
+{
+    $vaca = $this->database->getReference("items/$id")->getValue();
+    
+    if (!$vaca) {
+        return redirect()->route('produccion.form')->with('error', 'Vaca no encontrada');
+    }
+
+    $produccion = $vaca['produccion'] ?? [];
+    
+    // Ordenar por fecha descendente
+    usort($produccion, function($a, $b) {
+        return strtotime($b['fecha']) - strtotime($a['fecha']);
+    });
+
+    return view('items.ver-produccion', [
+        'vaca' => $vaca,
+        'produccion' => $produccion,
+        'vacaId' => $id
     ]);
 }
 

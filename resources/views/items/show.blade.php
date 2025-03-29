@@ -56,52 +56,30 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Sección de producción (si tienes estos datos) -->
-                @if(isset($item['produccion']))
-                <div class="mt-4">
-                    <h5 class="border-bottom pb-2"><i class="fas fa-chart-line"></i> Producción de Leche</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Cantidad (L)</th>
-                                    <th>Calidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($item['produccion'] as $produccion)
-                                <tr>
-                                    <td>{{ $produccion['fecha'] }}</td>
-                                    <td>{{ $produccion['cantidad'] }} L</td>
-                                    <td>{{ $produccion['calidad'] ?? '--' }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @endif
-            </div>
             
             <div class="card-footer bg-light">
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('items.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Volver al listado
-                    </a>
-                    <div>
-                        <a href="{{ route('items.edit', $id) }}" class="btn btn-primary me-2">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                            <i class="fas fa-trash-alt"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <div class="d-flex justify-content-between">
+        <a href="{{ route('items.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al listado
+        </a>
+        <div>
+            <!-- Botón Editar -->
+            <a href="{{ route('items.edit', $id) }}" class="btn btn-primary me-2">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            
+            <!-- Nuevo botón Producción -->
+            <a href="{{ route('produccion.historial', $id) }}" class="btn btn-info me-2">
+                <i class="fas fa-chart-line"></i> Producción
+            </a>
+            
+            <!-- Botón Eliminar -->
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
         </div>
     </div>
+</div>
 
     <!-- Modal de confirmación para eliminar -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
