@@ -16,3 +16,5 @@ Route::get('/produccion', [ItemController::class, 'produccionForm'])->name('prod
 Route::post('/produccion/buscar', [ItemController::class, 'searchForProduction'])->name('produccion.buscar');
 Route::post('/produccion/{id}/agregar', [ItemController::class, 'addProduction'])->name('produccion.agregar');
 Route::get('/produccion/{id}/historial', [ItemController::class, 'verProduccion'])->name('produccion.historial');
+
+Route::get('/', [ItemController::class, 'index'])->name('inicio');

@@ -132,7 +132,5 @@
     });
 </script>
 
-<style>
-    .d-none { display: none; }
-</style>
+
 @endsection

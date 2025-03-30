@@ -1,0 +1,22 @@
+
+/* Ajuste para el contenedor de fondo */
+
+.container {
+    margin-top: 70px; /* Altura de la barra superior */
+    min-height: calc(100vh - 70px);
+    background-image: url('../images/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 20px;
+}
+
+@media (max-width: 576px) {
+    .container {
+        margin-top: 110px; /* Ajuste para altura en móviles */
+        min-height: calc(100vh - 110px);
+    }
+    
+    
+}
+
