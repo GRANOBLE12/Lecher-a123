@@ -51,7 +51,7 @@
                         
                         <div class="col-md-3">
                             <label for="calidad">Calidad</label>
-                            <input type="text" class="form-control" name="calidad">
+                            <input type="text" class="form-control" name="calidad" required>
                         </div>
                     </div>
                     

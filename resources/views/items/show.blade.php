@@ -39,7 +39,7 @@
                             <h5 class="border-bottom pb-2"><i class="fas fa-clipboard-list"></i> Información Adicional</h5>
                             <div class="ps-3">
                                 <p><strong><i class="fas fa-cow"></i> ID Madre:</strong> 
-                                    {{ $item['id_madre'] ?: 'No registrada' }}
+                                    {{ $item['id_madre'] ?? 'No registrada' }}
                                 </p>
                                 @if($item['estado'] == 'Enferma')
                                     <p class="text-danger"><strong><i class="fas fa-bug"></i> Enfermedad:</strong> 
@@ -50,7 +50,7 @@
                                     </p>
                                 @endif
                                 <p><strong><i class="fas fa-comment"></i> Observaciones:</strong> 
-                                    {{ $item['observaciones'] ?: 'Ninguna' }}
+                                    {{ $item['observaciones'] ?? 'Ninguna' }}
                                 </p>
                             </div>
                         </div>
