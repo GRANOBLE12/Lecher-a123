@@ -1,26 +1,69 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Registro de Vacas</h1>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Registro de Vacas</h1>
-    <div>
-        <a href="{{ route('items.buscar') }}" class="btn btn-warning me-2">
-            <i class="fas fa-search"></i> Buscar Vaca
-        </a>
-        <a href="{{ route('produccion.form') }}" class="btn btn-info me-2">
-            <i class="fas fa-weight"></i> Producción Leche
-        </a>
-        <a href="{{ route('items.create') }}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Nuevo Registro
-        </a>
-    </div>
-</div>
-    
-</div>
 
-@if ($items && count($items) > 0)
+
+
+<link rel="stylesheet" href="{{ asset('css/index.css') }}">
+
+<body>
+
+    <div class="barra">
+
+        <div class="menu-container">
+
+            <button class="menu-btn">
+                <span>☰</span> Menú
+            </button>
+
+            <div class="menu-dropdown">
+                <a href="{{ route('produccion.form') }}" class="menu-item">Producción de Leche</a>
+                <a href="{{ route('items.create') }}" class="menu-item">Nuevo Registro</a>
+                <a href="{{ route('items.buscar') }}" class="menu-item">Buscar Vaca</a>
+                
+            </div>
+        </div>
+
+        <h1 id="titulo_1">
+            <a href="{{ url('/') }}" class="titulo-link">AgroIA LacteaPro</a>
+        </h1>
+
+
+    </div>
+
+
+    <div class="contenedor">
+        <div class="cuadro">
+            <img src="{{ asset('Images/fondo.jpg') }}" alt="Imagen de fondo">
+        </div>
+
+        <div class="cuadro-texto">
+            <h2>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum ipsa excepturi quam.</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime beatae et nostrum officia laboriosam architecto pariatur consectetur voluptate eius maiores molestiae...</p>
+        </div>
+    </div>
+
+
+    <button id="modoOscuroBtn" class="modo-oscuro-btn">
+        🌙
+    </button>
+
+
+    <div class="user-icon">
+        <img src="{{ asset('Images/user.png') }}" alt="Usuario">
+    </div>
+
+
+    <div class="faq-container">
+        <button class="faq-btn" id="faqSearchBtn">🔍</button>
+
+        <div id="faqSearchBox" class="faq-search-box d-none">
+            <input type="text" id="faqInput" class="form-control" placeholder="Buscar preguntas frecuentes...">
+            <div id="faqResults" class="faq-results"></div>
+        </div>
+    </div>
+
+    @if ($items && count($items) > 0)
 <div class="table-responsive">
     <table class="table table-striped">
         <thead class="table-dark">
@@ -69,4 +112,67 @@
     No hay registros de vacas disponibles.
 </div>
 @endif
-@endsection
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuBtn = document.querySelector(".menu-btn");
+            const menuDropdown = document.querySelector(".menu-dropdown");
+
+            menuBtn.addEventListener("click", function(event) {
+                event.stopPropagation();
+                menuDropdown.classList.toggle("active");
+            });
+
+            document.addEventListener("click", function(event) {
+                if (!menuDropdown.contains(event.target) && !menuBtn.contains(event.target)) {
+                    menuDropdown.classList.remove("active");
+                }
+            });
+        });
+
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const botonModoOscuro = document.getElementById("modoOscuroBtn");
+            const body = document.body;
+
+            if (!botonModoOscuro) {
+                console.error(" ERROR: No se encontró el botón de modo oscuro.");
+                return;
+            }
+
+            console.log(" Script de modo oscuro cargado correctamente.");
+
+            if (localStorage.getItem("modoOscuro") === "true") {
+                activarModoOscuro();
+            }
+
+            botonModoOscuro.addEventListener("click", function() {
+                console.log(" Botón de modo oscuro clickeado.");
+                if (body.classList.contains("dark-mode")) {
+                    desactivarModoOscuro();
+                } else {
+                    activarModoOscuro();
+                }
+            });
+
+            function activarModoOscuro() {
+                body.classList.add("dark-mode");
+                botonModoOscuro.textContent = "☀️";
+                localStorage.setItem("modoOscuro", "true");
+            }
+
+            function desactivarModoOscuro() {
+                body.classList.remove("dark-mode");
+                botonModoOscuro.textContent = "🌙";
+                localStorage.setItem("modoOscuro", "false");
+            }
+        });
+
+
+        
+    </script>
+</body>
+
+@endsection 
+
